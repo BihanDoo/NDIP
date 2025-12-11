@@ -77,13 +77,22 @@
                     <form class="row g-3 citizen-form" data-endpoint="/api/citizens/id">
                       <div class="col-12">
                         <label class="form-label">NDI ID</label>
-                        <input type="text" class="form-control" placeholder="e.g. NDI-123456" required />
+                        <input id="SId" name="NDI_ID" type="text" class="form-control" placeholder="e.g. NDI-123456" required />
                       </div>
                       <div class="col-12">
                         <button type="submit" class="btn btn-primary">
                           Find Citizen
                         </button>
                       </div>
+
+                      <!-- <div class="col-12 mt-3">
+                        <label class="form-label">Name</label>
+                        <input id="SName" type="text" class="form-control" readonly />
+                      </div>
+                      <div class="col-12 mt-2">
+                        <label class="form-label">Address / Nationality</label>
+                        <input id="SAddress" type="text" class="form-control" readonly />
+                      </div> -->
                     </form>
                   </div>
                 </div>
@@ -263,7 +272,47 @@
         $(".citizen-form").on("submit", function (event) {
           event.preventDefault();
           const endpoint = $(this).data("endpoint");
-          alert("Form is ready to send to " + endpoint);
+          const API_BASE = 'http://localhost:3000';
+
+          // If this is the ID lookup endpoint (ends with /id), perform a GET
+          if (typeof endpoint === 'string' && endpoint.match(/\/id$|\/id\/?$/)) {
+            // read the id value from the form (input with id SId)
+            const idVal = $(this).find('#SId').val();
+            if (!idVal) {
+              alert('Please enter an NDI ID');
+              return;
+            }
+
+            // Build the URL by replacing '/id' with '/{id}' (or appending if necessary)
+            const basePath = endpoint.replace(/\/id\/?$/, '');
+            const url = (API_BASE + basePath + '/' + encodeURIComponent(idVal));
+
+            $.ajax({
+              url: url,
+              type: 'get',
+              contentType: 'application/json',
+              dataType: 'json',
+              success: function (data, textStatus, jQxhr) {
+                // Populate result fields if present
+                if ($('#SName').length) {
+                  // try to build a friendly name from FirstName/LastName or fallback to data.name
+                  const name = (data.FirstName || data.name || '') + (data.LastName ? (' ' + data.LastName) : '');
+                  $('#SName').val(name.trim());
+                }
+                if ($('#SAddress').length) {
+                  // use address if provided, otherwise fallback to Nationality
+                  $('#SAddress').val(data.address || data.Nationality || '');
+                }
+              },
+              error: function (jqXhr, textStatus, errorThrown) {
+                console.log(errorThrown);
+                alert('Lookup failed: ' + (jqXhr.status || '') + ' ' + (jqXhr.responseText || errorThrown));
+              }
+            });
+          } else {
+            // Non-ID lookup: keep current behaviour (informational)
+            alert("Form is ready to send to " + endpoint);
+          }
         });
 
         $("#showAllBtn").on("click", function () {

@@ -1,6 +1,6 @@
 let express = require("express");
 let cors = require("cors");
-let { MongoClient } = require("mongodb");
+let { MongoClient, ObjectId } = require("mongodb");
 let path = require("path");
 let app = express();
 let port = process.env.port || 3000;
@@ -38,30 +38,40 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '..')));  // Serve static files from parent directory
 app.use('/api/citizens', router);
 
-// Get all citizens
+// GET /api/citizens
+// - If query param NDI_ID (or NID/nid) is present: return the matching citizen
+//   e.g. GET /api/citizens?NDI_ID=20001120888
+// - Otherwise return the full list
 router.get('/', async (req, res) => {
     try {
+        if (!citizens) citizens = db.collection(collectionName);
+
+        const lookup = req.query && (req.query.NDI_ID || req.query.NDI || req.query.NID || req.query.nid || req.query.ndi_id);
+        if (lookup) {
+            const orClauses = [];
+            // numeric match
+            const asNum = Number(lookup);
+            if (!Number.isNaN(asNum) && isFinite(asNum)) orClauses.push({ NDI_ID: asNum }, { id: asNum });
+
+            // string matches
+            orClauses.push({ NDI_ID: lookup }, { NID: lookup }, { id: lookup });
+
+            // try MongoDB ObjectId match
+            if (ObjectId.isValid(lookup)) {
+                try { orClauses.push({ _id: new ObjectId(lookup) }); } catch (e) { /* ignore */ }
+            }
+
+            const citizen = await citizens.findOne({ $or: orClauses });
+            if (!citizen) return res.status(404).send('Citizen not found');
+            const { _id, ...safe } = citizen;
+            return res.json(safe);
+        }
+
         const citizensList = await citizens.find({}).toArray();
         res.json(citizensList);
     } catch (error) {
         console.error("Error fetching citizens:", error);
         res.status(500).send('Error fetching citizens');
-    }
-});
-
-// Get citizen by ID
-router.get('/:id', async (req, res) => {
-    try {
-        const id = parseInt(req.params.id);
-        const citizen = await citizens.findOne({ id: id });
-        if (citizen) {
-            res.json(citizen);
-        } else {
-            res.status(404).send('Citizen not found');
-        }
-    } catch (error) {
-        console.error("Error fetching citizen:", error);
-        res.status(500).send('Error fetching citizen');
     }
 });
 
@@ -101,6 +111,17 @@ app.post('/api/citizens/register', async (req, res) => {
     }
 });
 
+
+
+
+
+
+
+
+
+
+
+
 // Simple login endpoint (lookup by NID)
 app.post('/api/login', async (req, res) => {
     try {
@@ -138,5 +159,30 @@ app.post('/api/login', async (req, res) => {
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Login error' });
+    }
+});
+
+// Support path-style lookup as well: GET /api/citizens/:id
+router.get('/:id', async (req, res) => {
+    try {
+        if (!citizens) citizens = db.collection(collectionName);
+        const idParam = req.params.id;
+        if (!idParam) return res.status(400).send('Missing id');
+
+        const orClauses = [];
+        const asNum = Number(idParam);
+        if (!Number.isNaN(asNum) && isFinite(asNum)) orClauses.push({ NDI_ID: asNum }, { id: asNum });
+        orClauses.push({ NDI_ID: idParam }, { NID: idParam }, { id: idParam });
+        if (ObjectId.isValid(idParam)) {
+            try { orClauses.push({ _id: new ObjectId(idParam) }); } catch (e) { }
+        }
+
+        const citizen = await citizens.findOne({ $or: orClauses });
+        if (!citizen) return res.status(404).send('Citizen not found');
+        const { _id, ...safe } = citizen;
+        res.json(safe);
+    } catch (error) {
+        console.error('Error fetching citizen by path id:', error);
+        res.status(500).send('Error fetching citizen');
     }
 });

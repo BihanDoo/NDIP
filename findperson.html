@@ -80,7 +80,7 @@
                         <input id="SId" name="NDI_ID" type="text" class="form-control" placeholder="e.g. NDI-123456" required />
                       </div>
                       <div class="col-12">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" id="findByIdBtn">
                           Find Citizen
                         </button>
                       </div>
@@ -240,6 +240,8 @@
 
         <hr class="my-5" />
 
+        <pre id="resultArea" class="p-3">Click a button above to test the API...</pre>
+
         
       </div>
     </main>
@@ -257,68 +259,27 @@
       </div>
     </footer>
 
-    <script
-      src="https://code.jquery.com/jquery-3.7.1.min.js"
-      integrity="sha256-3gJwYp4Z3+4oa4rYJDc6Xk9FfuH6Yz9EM8mL0Q5rx1w="
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      (function () {
-        $(".citizen-form").on("submit", function (event) {
-          event.preventDefault();
-          const endpoint = $(this).data("endpoint");
-          const API_BASE = 'http://localhost:3000';
 
-          // If this is the ID lookup endpoint (ends with /id), perform a GET
-          if (typeof endpoint === 'string' && endpoint.match(/\/id$|\/id\/?$/)) {
-            // read the id value from the form (input with id SId)
-            const idVal = $(this).find('#SId').val();
-            if (!idVal) {
-              alert('Please enter an NDI ID');
-              return;
-            }
-
-            // Build the URL by replacing '/id' with '/{id}' (or appending if necessary)
-            const basePath = endpoint.replace(/\/id\/?$/, '');
-            const url = (API_BASE + basePath + '/' + encodeURIComponent(idVal));
-
-            $.ajax({
-              url: url,
-              type: 'get',
-              contentType: 'application/json',
-              dataType: 'json',
-              success: function (data, textStatus, jQxhr) {
-                // Populate result fields if present
-                if ($('#SName').length) {
-                  // try to build a friendly name from FirstName/LastName or fallback to data.name
-                  const name = (data.FirstName || data.name || '') + (data.LastName ? (' ' + data.LastName) : '');
-                  $('#SName').val(name.trim());
-                }
-                if ($('#SAddress').length) {
-                  // use address if provided, otherwise fallback to Nationality
-                  $('#SAddress').val(data.address || data.Nationality || '');
-                }
+      const API_BASE = 'http://localhost:3000/api/citizens';
+      $('#showAllBtn').on('click', function() {
+          $('#resultArea').text('Loading...');
+          $.ajax({
+              url: API_BASE,
+              method: 'GET',
+              success: function(data) {
+                  $('#resultArea').text(JSON.stringify(data, null, 2));
               },
-              error: function (jqXhr, textStatus, errorThrown) {
-                console.log(errorThrown);
-                alert('Lookup failed: ' + (jqXhr.status || '') + ' ' + (jqXhr.responseText || errorThrown));
+              error: function(err) {
+                  $('#resultArea').text('Error fetching data');
+                  console.error(err);
               }
-            });
-          } else {
-            // Non-ID lookup: keep current behaviour (informational)
-            alert("Form is ready to send to " + endpoint);
-          }
-        });
+          });
+      });
 
-        $("#showAllBtn").on("click", function () {
-          alert("Show all citizens data-endpoint: " + $(this).data("endpoint"));
-        });
-      })();
+
     </script>
   </body>
 </html>

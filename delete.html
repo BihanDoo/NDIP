@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Delete Citizen - NDIP</title> 
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous"
+  />
+  <link rel="stylesheet" href="indexstyle.css" />
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg bg-white shadow-sm py-3">
+    <div class="container">
+      <a class="navbar-brand fw-bold text-primary" href="index.html">National Digital Identity Portal</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html#services">Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.html#updates">Announcements</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero bg-primary text-white py-5 mb-4">
+    <div class="container text-center">
+      <h1 class="display-5 fw-semibold mb-3">Delete a Citizen</h1>
+      <p class="fs-5 mb-0">Remove a citizen record from the National Digital Identity Portal safely.</p>
+    </div>
+  </header>
+
+  <!-- Delete Citizen Form -->
+  <section class="py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card p-4 shadow-sm">
+            <h5 class="mb-3">Delete Citizen Record</h5>
+            <form id="deleteCitizenForm" data-endpoint="/api/citizens/delete">
+              <div class="mb-3">
+                <label for="citizenId" class="form-label">Citizen ID</label>
+                <input type="text" class="form-control" id="citizenId" placeholder="Enter Citizen ID" required>
+              </div>
+              <button type="submit" class="btn btn-danger w-100">Delete Citizen</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Existing Citizens (Optional) -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <h5 class="mb-4">Registered Citizens (Demo List)</h5>
+      <div class="list-group" id="citizenList">
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+          <span>Citizen ID: 1001 - John Doe</span>
+          <button class="btn btn-sm btn-danger" data-id="1001">Delete</button>
+        </div>
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+          <span>Citizen ID: 1002 - Jane Smith</span>
+          <button class="btn btn-sm btn-danger" data-id="1002">Delete</button>
+        </div>
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+          <span>Citizen ID: 1003 - Michael Johnson</span>
+          <button class="btn btn-sm btn-danger" data-id="1003">Delete</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-4 bg-white shadow-sm mt-5">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+      <p class="mb-0">© 2025 National Digital Identity Office</p>
+      <div class="d-flex gap-3">
+        <a href="#" class="link-dark text-decoration-none">Accessibility</a>
+        <a href="#" class="link-dark text-decoration-none">Privacy</a>
+        <a href="#" class="link-dark text-decoration-none">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"
+  ></script>
+  <script>
+    $(function() {
+      // Form submit
+      $("#deleteCitizenForm").on("submit", function(e) {
+        e.preventDefault();
+        const citizenId = $("#citizenId").val();
+        alert("Delete request sent for Citizen ID: " + citizenId);
+        // Here you would do AJAX to delete from backend
+      });
+
+      // Delete buttons in list
+      $("#citizenList").on("click", "button", function() {
+        const id = $(this).data("id");
+        alert("Delete request sent for Citizen ID: " + id);
+        // Remove from UI for demo
+        $(this).closest(".list-group-item").remove();
+      });
+    });
+  </script>
+</body>
+</html>

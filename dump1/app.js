@@ -59,7 +59,7 @@ router.get('/', async (req, res) => {
         const value = req.query.NDI_ID;
         const firstname = req.query.FirstName;
         const lastname = req.query.LastName;
-
+        const DOB = req.query.DOB;
 
         
         if (value) {
@@ -79,6 +79,10 @@ router.get('/', async (req, res) => {
                 const citizensList = await citizens.find({"LastName": { $regex: lastname, $options: "i" }}).toArray();
                 res.json(citizensList);
                 console.log("fetched by last name");
+            }else if(DOB){
+                const citizensList = await citizens.find({"DoB": DOB}).toArray();
+                res.json(citizensList);
+                console.log("fetched by DOB");
             }else{
                 const citizensList = await citizens.find({}).toArray();
                 res.json(citizensList);

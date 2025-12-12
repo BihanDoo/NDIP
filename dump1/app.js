@@ -25,6 +25,17 @@ MongoClient.connect(mongoURI)
         // Start server after MongoDB connection
         app.listen(port, () => {
             console.log("Listening on port " + port);
+            const frames = ['\\', '|', '/', '-']; // The animation frames
+            let i = 0;
+
+            const loader = setInterval(() => {
+  // Use \r to return the cursor to the start of the current line
+  // The extra space overwrites any longer previous characters
+            process.stdout.write('\r' + frames[i++] + ' '); 
+            i %= frames.length; // Loop back to the start of the frames array
+            }, 250);
+
+
         });
     })
     .catch(error => {
@@ -46,17 +57,27 @@ router.get('/', async (req, res) => {
     try {
         if (!citizens) citizens = db.collection(collectionName);
         const value = req.query.NDI_ID;
+        const firstname = req.query.FirstName;
+        const lastname = req.query.LastName;
+
 
         
-        if (!value) {
-            const citizensList = await citizens.find({}).toArray();
-            res.json(citizensList);
-            console.log("fetched all");
-        }else {
+        if (value) {
             console.log("fetch by id: "+value);
             const citizensList = await citizens.findOne({"NID": value});
             res.json([citizensList]);
             console.log("fetched one");
+        }else {
+            if(firstname){
+
+            }else if(lastname){
+
+            }else{
+                const citizensList = await citizens.find({}).toArray();
+                res.json(citizensList);
+                console.log("fetched all");
+            }
+            
         }
         
 

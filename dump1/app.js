@@ -69,7 +69,7 @@ router.get('/', async (req, res) => {
             console.log("fetched one");
         }else {
             if(firstname){
-
+                const citizensList = await citizens.find({"FirstName": firstname}).toArray();
             }else if(lastname){
 
             }else{

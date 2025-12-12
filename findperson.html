@@ -71,9 +71,10 @@
                 </h2>
                 <div
                   id="collapseId"
-                  class="accordion-collapse collapse show"
+                  class="accordion-collapse collapse"
                   data-bs-parent="#lookupAccordion"
                 >
+                <!-- aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa -->
                   <div class="accordion-body">
                     <form class="row g-3 citizen-form" data-endpoint="/api/citizens/id">
                       <div class="col-12">
@@ -112,27 +113,33 @@
                 </h2>
                 <div
                   id="collapseNames"
-                  class="accordion-collapse collapse"
+                  class="accordion-collapse collapse show"
                   data-bs-parent="#lookupAccordion"
                 >
                   <div class="accordion-body">
-                    <form class="row g-3 citizen-form" data-endpoint="/api/citizens/name">
+                    <!-- <form class="row g-3 citizen-form" data-endpoint="/api/citizens/name"> -->
                       <div class="col-md-6">
                         <label class="form-label">First Name</label>
-                        <input type="text" class="form-control" name="firstName" id="FindByFName" required />
+                        <input type="text" class="form-control" name="firstName" id="FindByFName" onchange="fetchByFirstName()" oninput="fetchByFirstName()" required />
+                        <button type="button" class="btn btn-primary" onclick="fetchByFirstName()">
+                          Search by First Name
+                        </button>
                       </div>
+
+                      
 
                       <div class="col-md-6">
                         <label class="form-label">Last Name</label>
                         <input type="text" class="form-control" name="lastName" id="FindByLName" required />
+                        <button type="button" class="btn btn-primary" onclick="fetchBySecondName()">
+                          Search by Last Name
+                        </button>
                       </div>
 
                       <div class="col-12">
-                        <button type="submit" class="btn btn-primary">
-                          Search by Name
-                        </button>
+                        
                       </div>
-                    </form>
+                    <!-- </form> -->
                   </div>
                 </div>
               </div>
@@ -351,23 +358,25 @@
 					tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading records</td></tr>';
 				});
 		}
+    
 
 
+    
 
-    function fetchByName(){  
-       const SEARCH_API = 'http://localhost:3000/api/citizens';
-			const Fname = document.getElementById('FindByFName').value.trim();
+    function fetchBySecondName(){
       const Lname = document.getElementById('FindByLName').value.trim();
-      
-			if (!id) {
-				alert('Enter an NDI ID to search');
+      const SEARCH_API = 'http://localhost:3000/api/citizens';
+			
+
+			if (Fname=='') {
+				
 				return;
 			}
 			var tbody = document.getElementById('citizenTableBody');
 			if (!tbody) return;
 			tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Searching...</td></tr>';
 
-			fetch(SEARCH_API + '?NDI_ID=' + encodeURIComponent(id), { method: 'GET' })
+			fetch(SEARCH_API + '?FirstName=' + encodeURIComponent(Fname), { method: 'GET' })
 				.then(function(res) {
 					if (!res.ok) throw new Error('Network response was not ok (' + res.status + ')');
 					console.log('Response received:', res);
@@ -378,7 +387,7 @@
 					 //var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
                     //var list = data.citizens;
                     var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
-                    console.log('Citizens fetched by ID:', list);
+                    console.log('Citizens fetched by Name:', list);
 					tbody.innerHTML = '';
 					if (!list || list.length === 0) {
 						tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No records found</td></tr>';
@@ -420,6 +429,82 @@
 					alert('Search failed: ' + (err && err.message ? err.message : err));
 					tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading records</td></tr>';
 				});
+
+        
+    }
+
+
+
+
+
+
+    function fetchByFirstName(){  
+      const Fname = document.getElementById('FindByFName').value.trim();
+       const SEARCH_API = 'http://localhost:3000/api/citizens';
+			
+
+			if (Fname=='') {
+				
+				return;
+			}
+			var tbody = document.getElementById('citizenTableBody');
+			if (!tbody) return;
+			tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Searching...</td></tr>';
+
+			fetch(SEARCH_API + '?FirstName=' + encodeURIComponent(Fname), { method: 'GET' })
+				.then(function(res) {
+					if (!res.ok) throw new Error('Network response was not ok (' + res.status + ')');
+					console.log('Response received:', res);
+                    return res.json();
+                    
+				})
+				.then(function(data) {
+					 //var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
+                    //var list = data.citizens;
+                    var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
+                    console.log('Citizens fetched by Name:', list);
+					tbody.innerHTML = '';
+					if (!list || list.length === 0) {
+						tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No records found</td></tr>';
+						return;
+					}
+					function escapeHtml(str) {
+						if (str === null || str === undefined) return '';
+						return String(str)
+							.replace(/&/g, '&amp;')
+							.replace(/</g, '&lt;')
+							.replace(/>/g, '&gt;')
+							.replace(/"/g, '&quot;')
+							.replace(/'/g, '&#39;');
+					}
+					list.forEach(function (c) {
+						var ndi = c.NID;
+						var name = (c.FirstName || '') + (c.LastName ? ' ' + c.LastName : '');
+						var dob = c.DoB;
+						var email = c.Email;
+						var phone = c.Phone;
+						var occupation = c.Occupation;
+						var nationality = c.Nationality;
+						var blood = c.Blood_Group;
+						var tr = document.createElement('tr');
+						tr.innerHTML =
+							'<td>' + escapeHtml(ndi) + '</td>' +
+							'<td>' + escapeHtml(name) + '</td>' +
+							'<td>' + escapeHtml(dob) + '</td>' +
+							'<td>' + escapeHtml(email) + '</td>' +
+							'<td>' + escapeHtml(phone) + '</td>' +
+							'<td>' + escapeHtml(occupation) + '</td>' +
+							'<td>' + escapeHtml(nationality) + '</td>' +
+							'<td>' + escapeHtml(blood) + '</td>';
+						tbody.appendChild(tr);
+					});
+				})
+				.catch(function(err) {
+					console.error('Search failed:', err);
+					alert('Search failed: ' + (err && err.message ? err.message : err));
+					tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading records</td></tr>';
+				});
+
 
     }
 

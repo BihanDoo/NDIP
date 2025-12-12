@@ -69,7 +69,7 @@ router.get('/', async (req, res) => {
             console.log("fetched one");
         }else {
             if(firstname){
-                const citizensList = await citizens.find({"FirstName": firstname}).toArray();
+                const citizensList = await citizens.find({"FirstName": { $regex: firstname, $options: "i" }}).toArray();
                 res.json(citizensList);
                 console.log("fetched by first name");
             }else if(lastname){

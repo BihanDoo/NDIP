@@ -25,12 +25,12 @@ MongoClient.connect(mongoURI)
         // Start server after MongoDB connection
         app.listen(port, () => {
             console.log("Listening on port " + port);
-            const frames = ['\\', '|', '/', '-']; // The animation frames
+            const frames = ['○○○◉', '○○◉○', '○◉○○', '◉○○○']; // The animation frames
             let i = 0;
 
             const loader = setInterval(() => {
-  // Use \r to return the cursor to the start of the current line
-  // The extra space overwrites any longer previous characters
+        // Use \r to return the cursor to the start of the current line
+        // The extra space overwrites any longer previous characters
             process.stdout.write('\r' + frames[i++] + ' '); 
             i %= frames.length; // Loop back to the start of the frames array
             }, 250);

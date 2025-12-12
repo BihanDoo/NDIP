@@ -113,7 +113,7 @@
                 </h2>
                 <div
                   id="collapseNames"
-                  class="accordion-collapse collapse show"
+                  class="accordion-collapse collapse"
                   data-bs-parent="#lookupAccordion"
                 >
                   <div class="accordion-body">
@@ -153,18 +153,28 @@
                 </h2>
                 <div
                   id="collapseDate"
-                  class="accordion-collapse collapse"
+                  class="accordion-collapse collapse show"
                   data-bs-parent="#lookupAccordion"
                 >
                   <div class="accordion-body">
                     <form class="row g-3 citizen-form" data-endpoint="/api/citizens/dob">
                       <div class="col-md-6">
                         <label class="form-label">Date of Birth</label>
-                        <input type="date" class="form-control" />
+                        <div class="row g-2">
+                          <div class="col">
+                            <input name="day" type="number" class="form-control" placeholder="DD" min="1" max="31" value="12" required />
+                          </div>
+                          <div class="col">
+                            <input name="month" type="number" class="form-control" placeholder="MM" min="1" max="12" value="12" required />
+                          </div>
+                          <div class="col">
+                            <input name="year" type="number" class="form-control" placeholder="YYYY" min="1900" max="2100" value="2000" required />
+                          </div>
+                        </div>
                       </div>
                       
                       <div class="col-12">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="button" class="btn btn-primary">
                           Find Citizen
                         </button>
                       </div>
@@ -360,7 +370,7 @@
 
 
 
-
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
    async function fetchBySecondName(){
       const Lname = document.getElementById('FindByLName').value.trim();
       const SEARCH_API = 'http://localhost:3000/api/citizens';

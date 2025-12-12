@@ -6,6 +6,7 @@ let app = express();
 let port = process.env.port || 3000;
 let router = express.Router();
 let router2 = express.Router();
+let router3 = express.Router();
 
 // MongoDB connection string - update this with your MongoDB URI
 const mongoURI = "mongodb://localhost:27017";
@@ -50,6 +51,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '..')));  // Serve static files from parent directory
 app.use('/api/citizens', router);
 app.use('/api/citizens/delete', router2);
+app.use('/api/citizens/update', router3);
 
 
 // GET /api/citizens
@@ -134,6 +136,69 @@ router2.post('/',async (req, res) => {
 
 });
 
+
+
+router3.put('/', async (req, res) => {
+    const value = req.query.id;  
+    const payload = req.body || {};
+
+    console.log("mm"+req.body);
+    console.log("Request body:", payload);
+
+    if (!payload.FirstName || !payload.LastName) {
+        return res.status(400).json({
+            error: 'Missing required fields: FirstName, LastName'
+        });
+    }
+
+    try {
+        if (!citizens) citizens = db.collection(collectionName);
+
+        const result = await citizens.updateOne(
+            { NID: value },
+            { $set: payload }
+        );
+
+        res.json(result);
+        console.log("updated:", result);
+    } catch (error) {
+        console.log("error:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+
+
+
+// router3.put('/',async (req, res) => {
+//     const value = req.body.id;
+//     console.log("hmm");
+//      const payload = req.body || {};
+//     console.log('Request body:'+ req.body);
+//         // Basic required fields check (FirstName, LastName, DoB)
+//         if (!payload.FirstName || !payload.LastName || !payload.DoB) {
+//             console.log('Missing required fields');
+//             return res.status(400).json({ error: 'Missing required fields: FirstName, LastName, DoB' });
+//         }
+
+//         // Generate a simple NID for the demo if not provided
+//         if (!payload.NID) {
+//             payload.NID = 'NID' + Date.now().toString().slice(-8);
+//         }
+
+//     try{
+//         if (!citizens) citizens = db.collection(collectionName);
+        
+//         const result = await citizens.updateOne({ "NID": value });
+//         res.json(result);
+//         console.log("updated: "+ result);
+//     }catch (error){
+//         console.log("error : " +error);
+//     }
+
+
+// });
 
 
 

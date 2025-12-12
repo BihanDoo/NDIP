@@ -26,7 +26,7 @@
  <header class="hero text-center">
       <div class="container">
         <p class="text-uppercase text-white-50 mb-2">Update Citizen</p>
-        <h1 class="fw-semibold">Modify Citizen Details</h1>
+        <h1 class="fw-semibold">Update Citizen Details</h1>
         <p class="mb-0">
           Use the forms below to update citizen records in the digital system.
         </p>
@@ -61,7 +61,7 @@
                 >
                   <div class="accordion-body">
 
-                    <form id="updateFormId" class="row g-3" data-endpoint="/api/citizens/update/id">
+                    <form id="updateFormId" class="row g-3" >
                       <div class="col-12">
                         <label class="form-label">NDI ID</label>
                         <input
@@ -69,33 +69,34 @@
                           name="NDI_ID"
                           class="form-control"
                           placeholder="e.g. NDI-123456"
+                          id="ndiId"
                           required
                         />
                       </div>
 
                       <div class="col-md-6">
                         <label class="form-label">New First Name</label>
-                        <input type="text" name="FirstName" class="form-control" />
+                        <input type="text" name="FirstName" value="testABC" class="form-control" />
                       </div>
 
                       <div class="col-md-6">
                         <label class="form-label">New Last Name</label>
-                        <input type="text" name="LastName" class="form-control" />
+                        <input type="text" name="LastName"value="testABC" class="form-control" />
                       </div>
 
                       <div class="col-md-6">
                         <label class="form-label">New Email</label>
-                        <input type="email" name="Email" class="form-control" />
+                        <input type="email" name="Email"value="testABC@abc.co" class="form-control" />
                       </div>
 
                       <div class="col-md-6">
                         <label class="form-label">New Phone</label>
-                        <input type="tel" name="Phone" class="form-control" />
+                        <input type="tel" name="Phone"value="123879654" class="form-control" />
                       </div>
 
                       <div class="col-md-6">
                         <label class="form-label">New Occupation</label>
-                        <input type="text" name="Occupation" class="form-control" />
+                        <input type="text" name="Occupation" value="testABC" class="form-control" />
                       </div>
 
                       <div class="col-12">
@@ -129,30 +130,30 @@
                 >
                   <div class="accordion-body">
 
-                    <form id="updateFormName" class="row g-3" data-endpoint="/api/citizens/update/firstname">
+                    <form id="updateFormName" class="row g-3" >
                       <div class="col-12">
                         <label class="form-label">Current First Name</label>
-                        <input type="text" name="FirstName" class="form-control" required />
+                        <input type="text" name="FirstName" value="testABC" class="form-control" required />
                       </div>
 
                       <div class="col-md-6">
                         <label class="form-label">New Last Name</label>
-                        <input type="text" name="LastName" class="form-control" />
+                        <input type="text" name="LastName" value="abceetestABC" class="form-control" />
                       </div>
 
                       <div class="col-md-6">
                         <label class="form-label">New Email</label>
-                        <input type="email" name="Email" class="form-control" />
+                        <input type="email" name="Email" value="testABC@abcbc.co" class="form-control" />
                       </div>
 
                       <div class="col-md-6">
                         <label class="form-label">New Phone</label>
-                        <input type="tel" name="Phone" class="form-control" />
+                        <input type="tel" name="Phone" value="123978654" class="form-control" />
                       </div>
 
                       <div class="col-md-6">
                         <label class="form-label">New Occupation</label>
-                        <input type="text" name="Occupation" class="form-control" />
+                        <input type="text" name="Occupation" value="testABC" class="form-control" />
                       </div>
 
                       <div class="col-12">
@@ -188,20 +189,34 @@ Click an update button to test the API...
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-      function handleUpdate(formId) {
-        const form = $(formId);
-        const endpoint = form.data("endpoint");
+      //function handleUpdate(formId) {
 
-        form.on("submit", function (e) {
+
+         const form = $("#updateFormId");
+         const endpoint = form.data("endpoint");
+
+         form.on("submit", function (e) {
           e.preventDefault();
+          const NID = $("#ndiId").val();
+          if (NID == '') {
 
-          const data = form.serialize();
+            alert("NDI ID is required.");
+            return;
+          }
+
+          const formDataArray = form.serializeArray();
+          const dataObj = {};
+          formDataArray.forEach(x => dataObj[x.name] = x.value);
+
+
           $("#resultArea").text("Updating...");
+          console.log("Submitting data:", dataObj);
 
           $.ajax({
-            url: "http://localhost:3000" + endpoint,
+            url: "http://localhost:3000/api/citizens/update/?id=" + NID,
             method: "PUT",
-            data: data,
+            contentType: "application/json",
+            data: JSON.stringify(dataObj),
             success: function (res) {
               $("#resultArea").text(JSON.stringify(res, null, 2));
             },
@@ -212,7 +227,7 @@ Click an update button to test the API...
             },
           });
         });
-      }
+      //}
 
       $(document).ready(function () {
         handleUpdate("#updateFormId");

@@ -153,7 +153,7 @@
                 </h2>
                 <div
                   id="collapseDate"
-                  class="accordion-collapse collapse show"
+                  class="accordion-collapse collapse"
                   data-bs-parent="#lookupAccordion"
                 >
                   <div class="accordion-body">
@@ -162,19 +162,19 @@
                         <label class="form-label">Date of Birth</label>
                         <div class="row g-2">
                           <div class="col">
-                            <input name="day" type="number" class="form-control" placeholder="DD" min="1" max="31" value="12" required />
+                            <input name="day" type="number" class="form-control" id="DOBDD" placeholder="DD" min="1" max="31" value="12" required />
                           </div>
                           <div class="col">
-                            <input name="month" type="number" class="form-control" placeholder="MM" min="1" max="12" value="12" required />
+                            <input name="month" type="number" class="form-control" id="DOBMM" placeholder="MM" min="1" max="12" value="12" required />
                           </div>
                           <div class="col">
-                            <input name="year" type="number" class="form-control" placeholder="YYYY" min="1900" max="2100" value="2000" required />
+                            <input name="year" type="number" class="form-control" id="DOBYYYY" placeholder="YYYY" min="1900" max="2100" value="2000" required />
                           </div>
                         </div>
                       </div>
                       
                       <div class="col-12">
-                        <button type="button" class="btn btn-primary">
+                        <button type="button" class="btn btn-primary" onclick="fetchByDOB()">
                           Find Citizen
                         </button>
                       </div>
@@ -196,18 +196,18 @@
                 </h2>
                 <div
                   id="collapseContact"
-                  class="accordion-collapse collapse"
+                  class="accordion-collapse collapse show"
                   data-bs-parent="#lookupAccordion"
                 >
                   <div class="accordion-body">
                     <form class="row g-3 citizen-form" data-endpoint="/api/citizens/contact">
                       <div class="col-md-6">
                         <label class="form-label">Email</label>
-                        <input type="email" class="form-control" />
+                        <input type="email" id="fetchEmail" class="form-control" oninput="fetchByEmail()"/>
                       </div>
                       <div class="col-md-6">
                         <label class="form-label">Phone Number</label>
-                        <input type="tel" class="form-control" />
+                        <input type="tel" id="fetchPhone" class="form-control" oninput="fetchByPhoneNumber()"/>
                       </div>
                       <div class="col-12">
                         <button type="submit" class="btn btn-primary">
@@ -448,6 +448,91 @@
 
 
 
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+async function fetchByDOB(){
+      const DD = Number(document.getElementById('DOBDD').value);
+      const MM = Number(document.getElementById('DOBMM').value);
+      const YYYY = Number(document.getElementById('DOBYYYY').value);
+      const DOB = YYYY + '-' + MM + '-' + DD;
+      const SEARCH_API = 'http://localhost:3000/api/citizens';
+			
+
+			if (DOB=='') {
+				
+				return;
+			}
+			var tbody = document.getElementById('citizenTableBody');
+			if (!tbody) return;
+      
+			tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Searching...</td></tr>';
+      const delay = ms => new Promise(res => setTimeout(res, ms));
+      await delay(300);
+			fetch(SEARCH_API + '?DOB=' + encodeURIComponent(DOB), { method: 'GET' })
+				.then(function(res) {
+					if (!res.ok) throw new Error('Network response was not ok (' + res.status + ')');
+					console.log('Response received:', res);
+                    return res.json();
+                    
+				})
+				.then(function(data) {
+					 //var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
+                    //var list = data.citizens;
+                    var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
+                    console.log('Citizens fetched by Name:', list);
+					tbody.innerHTML = '';
+					if (!list || list.length === 0) {
+						tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No records found</td></tr>';
+						return;
+					}
+					function escapeHtml(str) {
+						if (str === null || str === undefined) return '';
+						return String(str)
+							.replace(/&/g, '&amp;')
+							.replace(/</g, '&lt;')
+							.replace(/>/g, '&gt;')
+							.replace(/"/g, '&quot;')
+							.replace(/'/g, '&#39;');
+					}
+					list.forEach(function (c) {
+						var ndi = c.NID?c.NID:'';
+						var name = (c.FirstName || '') + (c.LastName ? ' ' + c.LastName : '');
+						var dob = c.DoB;
+						var email = c.Email;
+						var phone = c.Phone;
+						var occupation = c.Occupation;
+						var nationality = c.Nationality;
+						var blood = c.Blood_Group;
+						var tr = document.createElement('tr');
+						tr.innerHTML =
+							'<td>' + escapeHtml(ndi) + '</td>' +
+							'<td>' + escapeHtml(name) + '</td>' +
+							'<td>' + escapeHtml(dob) + '</td>' +
+							'<td>' + escapeHtml(email) + '</td>' +
+							'<td>' + escapeHtml(phone) + '</td>' +
+							'<td>' + escapeHtml(occupation) + '</td>' +
+							'<td>' + escapeHtml(nationality) + '</td>' +
+							'<td>' + escapeHtml(blood) + '</td>';
+						tbody.appendChild(tr);
+					});
+				})
+				.catch(function(err) {
+					console.error('Search failed:', err);
+					alert('Search failed: ' + (err && err.message ? err.message : err));
+					tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading records</td></tr>';
+				});
+
+        
+    }
+
+
+
+
+
+
+
+
     async function fetchByFirstName(){  
       const Fname = document.getElementById('FindByFName').value.trim();
        const SEARCH_API = 'http://localhost:3000/api/citizens';
@@ -520,6 +605,162 @@
 
     }
 
+
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+    async function fetchByEmail(){
+      const Email = document.getElementById('fetchEmail').value.trim();
+      const SEARCH_API = 'http://localhost:3000/api/citizens';
+			
+
+			if (Email=='') {
+				
+				return;
+			}
+			var tbody = document.getElementById('citizenTableBody');
+			if (!tbody) return;
+      
+			tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Searching...</td></tr>';
+      const delay = ms => new Promise(res => setTimeout(res, ms));
+      await delay(300);
+			fetch(SEARCH_API + '?Email=' + encodeURIComponent(Email), { method: 'GET' })
+				.then(function(res) {
+					if (!res.ok) throw new Error('Network response was not ok (' + res.status + ')');
+					console.log('Response received:', res);
+                    return res.json();
+                    
+				})
+				.then(function(data) {
+					 //var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
+                    //var list = data.citizens;
+                    var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
+                    console.log('Citizens fetched by Name:', list);
+					tbody.innerHTML = '';
+					if (!list || list.length === 0) {
+						tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No records found</td></tr>';
+						return;
+					}
+					function escapeHtml(str) {
+						if (str === null || str === undefined) return '';
+						return String(str)
+							.replace(/&/g, '&amp;')
+							.replace(/</g, '&lt;')
+							.replace(/>/g, '&gt;')
+							.replace(/"/g, '&quot;')
+							.replace(/'/g, '&#39;');
+					}
+					list.forEach(function (c) {
+						var ndi = c.NID?c.NID:'';
+						var name = (c.FirstName || '') + (c.LastName ? ' ' + c.LastName : '');
+						var dob = c.DoB;
+						var email = c.Email;
+						var phone = c.Phone;
+						var occupation = c.Occupation;
+						var nationality = c.Nationality;
+						var blood = c.Blood_Group;
+						var tr = document.createElement('tr');
+						tr.innerHTML =
+							'<td>' + escapeHtml(ndi) + '</td>' +
+							'<td>' + escapeHtml(name) + '</td>' +
+							'<td>' + escapeHtml(dob) + '</td>' +
+							'<td>' + escapeHtml(email) + '</td>' +
+							'<td>' + escapeHtml(phone) + '</td>' +
+							'<td>' + escapeHtml(occupation) + '</td>' +
+							'<td>' + escapeHtml(nationality) + '</td>' +
+							'<td>' + escapeHtml(blood) + '</td>';
+						tbody.appendChild(tr);
+					});
+				})
+				.catch(function(err) {
+					console.error('Search failed:', err);
+					alert('Search failed: ' + (err && err.message ? err.message : err));
+					tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading records</td></tr>';
+				});
+
+        
+    }
+
+
+
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    
+async function fetchByPhoneNumber(){
+      const Phone = document.getElementById('fetchPhone').value.trim();
+      const SEARCH_API = 'http://localhost:3000/api/citizens';
+			
+
+			if (Phone=='') {
+				
+				return;
+			}
+			var tbody = document.getElementById('citizenTableBody');
+			if (!tbody) return;
+      
+			tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Searching...</td></tr>';
+      const delay = ms => new Promise(res => setTimeout(res, ms));
+      await delay(300);
+			fetch(SEARCH_API + '?Phone=' + encodeURIComponent(Phone), { method: 'GET' })
+				.then(function(res) {
+					if (!res.ok) throw new Error('Network response was not ok (' + res.status + ')');
+					console.log('Response received:', res);
+                    return res.json();
+                    
+				})
+				.then(function(data) {
+					 //var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
+                    //var list = data.citizens;
+                    var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
+                    console.log('Citizens fetched by Name:', list);
+					tbody.innerHTML = '';
+					if (!list || list.length === 0) {
+						tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No records found</td></tr>';
+						return;
+					}
+					function escapeHtml(str) {
+						if (str === null || str === undefined) return '';
+						return String(str)
+							.replace(/&/g, '&amp;')
+							.replace(/</g, '&lt;')
+							.replace(/>/g, '&gt;')
+							.replace(/"/g, '&quot;')
+							.replace(/'/g, '&#39;');
+					}
+					list.forEach(function (c) {
+						var ndi = c.NID?c.NID:'';
+						var name = (c.FirstName || '') + (c.LastName ? ' ' + c.LastName : '');
+						var dob = c.DoB;
+						var email = c.Email;
+						var phone = c.Phone;
+						var occupation = c.Occupation;
+						var nationality = c.Nationality;
+						var blood = c.Blood_Group;
+						var tr = document.createElement('tr');
+						tr.innerHTML =
+							'<td>' + escapeHtml(ndi) + '</td>' +
+							'<td>' + escapeHtml(name) + '</td>' +
+							'<td>' + escapeHtml(dob) + '</td>' +
+							'<td>' + escapeHtml(email) + '</td>' +
+							'<td>' + escapeHtml(phone) + '</td>' +
+							'<td>' + escapeHtml(occupation) + '</td>' +
+							'<td>' + escapeHtml(nationality) + '</td>' +
+							'<td>' + escapeHtml(blood) + '</td>';
+						tbody.appendChild(tr);
+					});
+				})
+				.catch(function(err) {
+					console.error('Search failed:', err);
+					alert('Search failed: ' + (err && err.message ? err.message : err));
+					tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading records</td></tr>';
+				});
+
+        
+    }
     </script>
   </body>
 </html>

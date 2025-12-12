@@ -196,7 +196,7 @@
                 </h2>
                 <div
                   id="collapseContact"
-                  class="accordion-collapse collapse show"
+                  class="accordion-collapse collapse"
                   data-bs-parent="#lookupAccordion"
                 >
                   <div class="accordion-body">
@@ -232,14 +232,14 @@
                 </h2>
                 <div
                   id="collapseOccupation"
-                  class="accordion-collapse collapse"
+                  class="accordion-collapse collapse show"
                   data-bs-parent="#lookupAccordion"
                 >
                   <div class="accordion-body">
                     <form class="row g-3 citizen-form" data-endpoint="/api/citizens/occupation">
                       <div class="col-12">
                         <label class="form-label">Occupation</label>
-                        <input type="text" class="form-control" />
+                        <input type="text" id="FindByOCP" class="form-control" oninput="fetchByOccupation()" />
                       </div>
                       <div class="col-12">
                         <button type="submit" class="btn btn-primary">
@@ -760,6 +760,90 @@ async function fetchByPhoneNumber(){
 				});
 
         
+    }
+
+
+
+
+
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+    async function fetchByOccupation(){  
+      const OCP = document.getElementById('FindByOCP').value.trim();
+       const SEARCH_API = 'http://localhost:3000/api/citizens';
+			
+
+			if (OCP=='') {
+				
+				return;
+			}
+			var tbody = document.getElementById('citizenTableBody');
+			if (!tbody) return;
+			tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Searching...</td></tr>';
+
+      const delay = ms => new Promise(res => setTimeout(res, ms));
+      await delay(300);
+			fetch(SEARCH_API + '?OCP=' + encodeURIComponent(OCP), { method: 'GET' })
+				.then(function(res) {
+					if (!res.ok) throw new Error('Network response was not ok (' + res.status + ')');
+					console.log('Response received:', res);
+                    return res.json();
+                    
+				})
+				.then(function(data) {
+					 //var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
+                    //var list = data.citizens;
+                    var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
+                    console.log('Citizens fetched by Name:', list);
+					tbody.innerHTML = '';
+					if (!list || list.length === 0) {
+						tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No records found</td></tr>';
+						return;
+					}
+					function escapeHtml(str) {
+						if (str === null || str === undefined) return '';
+						return String(str)
+							.replace(/&/g, '&amp;')
+							.replace(/</g, '&lt;')
+							.replace(/>/g, '&gt;')
+							.replace(/"/g, '&quot;')
+							.replace(/'/g, '&#39;');
+					}
+					list.forEach(function (c) {
+						var ndi = c.NID;
+						var name = (c.FirstName || '') + (c.LastName ? ' ' + c.LastName : '');
+						var dob = c.DoB;
+						var email = c.Email;
+						var phone = c.Phone;
+						var occupation = c.Occupation;
+						var nationality = c.Nationality;
+						var blood = c.Blood_Group;
+						var tr = document.createElement('tr');
+						tr.innerHTML =
+							'<td>' + escapeHtml(ndi) + '</td>' +
+							'<td>' + escapeHtml(name) + '</td>' +
+							'<td>' + escapeHtml(dob) + '</td>' +
+							'<td>' + escapeHtml(email) + '</td>' +
+							'<td>' + escapeHtml(phone) + '</td>' +
+							'<td>' + escapeHtml(occupation) + '</td>' +
+							'<td>' + escapeHtml(nationality) + '</td>' +
+							'<td>' + escapeHtml(blood) + '</td>';
+						tbody.appendChild(tr);
+					});
+				})
+				.catch(function(err) {
+					console.error('Search failed:', err);
+					alert('Search failed: ' + (err && err.message ? err.message : err));
+					tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading records</td></tr>';
+				});
+
+
     }
     </script>
   </body>

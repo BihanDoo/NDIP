@@ -62,6 +62,7 @@ router.get('/', async (req, res) => {
         const DOB = req.query.DOB;
         const Email = req.query.Email;
         const Phone = req.query.Phone;
+        const OCP = req.query.OCP;
 
         
         if (value) {
@@ -94,6 +95,10 @@ router.get('/', async (req, res) => {
                 const citizensList = await citizens.find({"Phone": { $regex: Phone, $options: "i" }}).toArray();
                 res.json(citizensList);
                 console.log("fetched by Phone: " +Phone);
+            }else if(OCP){
+                const citizensList = await citizens.find({"Occupation": { $regex: OCP, $options: "i" }}).toArray();
+                res.json(citizensList);
+                console.log("fetched by Occupation: " +OCP);
             }else{
                 const citizensList = await citizens.find({}).toArray();
                 res.json(citizensList);

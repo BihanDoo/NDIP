@@ -45,30 +45,22 @@ app.use('/api/citizens', router);
 router.get('/', async (req, res) => {
     try {
         if (!citizens) citizens = db.collection(collectionName);
+        const value = req.query.NDI_ID;
 
-        const lookup = req.query && (req.query.NDI_ID || req.query.NDI || req.query.NID || req.query.nid || req.query.ndi_id);
-        if (lookup) {
-            const orClauses = [];
-            // numeric match
-            const asNum = Number(lookup);
-            if (!Number.isNaN(asNum) && isFinite(asNum)) orClauses.push({ NDI_ID: asNum }, { id: asNum });
-
-            // string matches
-            orClauses.push({ NDI_ID: lookup }, { NID: lookup }, { id: lookup });
-
-            // try MongoDB ObjectId match
-            if (ObjectId.isValid(lookup)) {
-                try { orClauses.push({ _id: new ObjectId(lookup) }); } catch (e) { /* ignore */ }
-            }
-
-            const citizen = await citizens.findOne({ $or: orClauses });
-            if (!citizen) return res.status(404).send('Citizen not found');
-            const { _id, ...safe } = citizen;
-            return res.json(safe);
+        
+        if (!value) {
+            const citizensList = await citizens.find({}).toArray();
+            res.json(citizensList);
+            console.log("fetched all");
+        }else {
+            console.log("fetch by id: "+value);
+            const citizensList = await citizens.findOne({"NID": value});
+            res.json([citizensList]);
+            console.log("fetched one");
         }
+        
 
-        const citizensList = await citizens.find({}).toArray();
-        res.json(citizensList);
+       
     } catch (error) {
         console.error("Error fetching citizens:", error);
         res.status(500).send('Error fetching citizens');

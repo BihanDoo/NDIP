@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Show All Citizens • NDI Portal</title>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+			crossorigin="anonymous"
+		/>
+		<link rel="stylesheet" href="indexstyle.css" />
+	</head>
+	<body>
+		<nav class="navbar navbar-expand-lg bg-white shadow-sm py-3">
+			<div class="container">
+				<a class="navbar-brand fw-bold text-primary" href="index.html">National Digital Identity Portal</a>
+				<div class="ms-auto d-flex gap-2">
+					<a class="btn btn-outline-primary btn-sm" href="index.html">Home</a>
+					<a class="btn btn-primary btn-sm" href="register.html">Register</a>
+				</div>
+			</div>
+		</nav>
+
+		<header class="hero text-center py-5">
+			<div class="container">
+				<p class="text-uppercase text-white-50 mb-2">Registered Citizens</p>
+				<h1 class="fw-semibold">All Registered Citizens</h1>
+				<p class="mb-0">Browse, search, and export citizen data. This page is UI-only — wire the APIs where indicated.</p>
+			</div>
+		</header>
+
+		<main class="py-5">
+			<div class="container">
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<div class="d-flex gap-2">
+						<input id="searchInput" class="form-control" style="min-width:300px" placeholder="Search by name, NDI ID, email..." />
+						<button id="searchBtn" class="btn btn-outline-secondary">Search</button>
+					</div>
+					<div>
+						<button id="refreshBtn" class="btn btn-primary">Refresh</button>
+						<button id="exportBtn" class="btn btn-outline-secondary">Export CSV</button>
+					</div>
+				</div>
+
+				<div class="table-responsive shadow-sm rounded bg-white">
+					<table class="table table-striped mb-0">
+						<thead class="table-light">
+							<tr>
+								<th scope="col">NDI ID</th>
+								<th scope="col">Name</th>
+								<th scope="col">DoB</th>
+								<th scope="col">Email</th>
+								<th scope="col">Phone</th>
+								<th scope="col">Occupation</th>
+								<th scope="col">Nationality</th>
+								<th scope="col">Blood Group</th>
+							</tr>
+						</thead>
+						<tbody id="citizenTableBody">
+							<!-- eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee -->
+                            
+                        </tbody>
+					</table>
+				</div>
+
+				<div class="d-flex justify-content-between align-items-center mt-3">
+					<div class="text-muted">Showing <strong>2</strong> of <strong>2</strong> records (static demo)</div>
+					<nav aria-label="Page navigation">
+						<ul class="pagination mb-0">
+							<li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+							<li class="page-item active"><a class="page-link" href="#">1</a></li>
+							<li class="page-item"><a class="page-link" href="#">2</a></li>
+							<li class="page-item"><a class="page-link" href="#">Next</a></li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</main>
+
+		<footer class="py-4 bg-white">
+			<div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+				<p class="mb-0">© 2025 National Digital Identity Office</p>
+				<div class="d-flex gap-3">
+					<a href="#" class="link-dark text-decoration-none">Accessibility</a>
+					<a href="#" class="link-dark text-decoration-none">Privacy</a>
+					<a href="#" class="link-dark text-decoration-none">Contact</a>
+				</div>
+			</div>
+		</footer>
+
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+		<script>
+            fetchCitizens();
+			// UI-only helpers (no backend calls). Replace these with AJAX when ready.
+			(function () {
+				document.getElementById('refreshBtn').addEventListener('click', function () {
+					fetchCitizens();
+				});
+
+				document.getElementById('exportBtn').addEventListener('click', function () {
+					alert('Export CSV clicked — implement CSV generation on the client or server');
+				});
+
+				document.getElementById('searchBtn').addEventListener('click', function () {
+					var q = document.getElementById('searchInput').value.trim();
+					if (!q) {
+						alert('Enter a search term (name, NDI ID, or email)');
+						return;
+					}
+					alert('Search for: ' + q + ' — wire this to your search API');
+				});
+			})();
+
+		async function fetchCitizens() {
+			var tbody = document.getElementById('citizenTableBody');
+			tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Loading...</td></tr><tr><td colspan="8" class="text-center text-muted"><div class="progress" role="progressbar" aria-label="Animated striped" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 25%"></div></div></td></tr>';
+            
+			const delay = ms => new Promise(res => setTimeout(res, ms));
+
+			await delay(500);
+			// Fetch citizen data from backend API (vanilla JS, no jQuery)
+			console.log('Fetching citizen data from API...');
+			const API_BASE = 'http://localhost:3000/api/citizens/';
+
+			// perform GET request
+			fetch(API_BASE, { method: 'GET' })
+				.then(function (res) {
+					if (!res.ok) throw new Error('Network response was not ok (' + res.status + ')');
+					console.log('Response received:', res);
+					return res.json();
+				})
+				.then(function (data) {
+					var tbody = document.getElementById('citizenTableBody');
+					if (!tbody) return;
+
+					// support both array responses and object-wrapped results
+					var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
+					// clear existing rows
+					tbody.innerHTML = '';
+					console.log('Citizens fetched:', list);
+					if (!list || list.length === 0) {
+						console.log('No citizens found');
+						tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No records found</td></tr>';
+						return;
+					}
+
+					// helper to escape HTML
+					function escapeHtml(str) {
+						if (str === null || str === undefined) return '';
+						return String(str)
+							.replace(/&/g, '&amp;')
+							.replace(/</g, '&lt;')
+							.replace(/>/g, '&gt;')
+							.replace(/"/g, '&quot;')
+							.replace(/'/g, '&#39;');
+					}
+
+					list.forEach(function (c) {
+						var ndi = c.NID
+						var name =(c.FirstName) + (' ' + c.LastName);
+						var dob = c.DoB;
+						var email = c.Email;
+						var phone = c.Phone;
+						var occupation = c.Occupation;
+						var nationality = c.Nationality;
+						var blood = c.Blood_Group;
+						console.log('Citizen:', ndi, name, dob, email);
+						var tr = document.createElement('tr');
+						tr.innerHTML =
+							'<td>' + escapeHtml(ndi) + '</td>' +
+							'<td>' + escapeHtml(name) + '</td>' +
+							'<td>' + escapeHtml(dob) + '</td>' +
+							'<td>' + escapeHtml(email) + '</td>' +
+							'<td>' + escapeHtml(phone) + '</td>' +
+							'<td>' + escapeHtml(occupation) + '</td>' +
+							'<td>' + escapeHtml(nationality) + '</td>' +
+							'<td>' + escapeHtml(blood) + '</td>';
+						tbody.appendChild(tr);
+					});
+				})
+				.catch(function (err) {
+					console.error('Failed to fetch citizens:', err);
+					alert('Failed to fetch citizens: ' + (err && err.message ? err.message : err));
+				});
+		}
+
+
+		</script>
+	</body>
+</html>
+

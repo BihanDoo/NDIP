@@ -267,7 +267,7 @@
       $('#showAllBtn').on('click', function() {
           $('#resultArea').text('Loading...');
           $.ajax({
-              url: API_BASE,
+              url: API_BASE+'/',
               method: 'GET',
               success: function(data) {
                   $('#resultArea').text(JSON.stringify(data, null, 2));

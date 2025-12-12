@@ -118,12 +118,14 @@
                     <form class="row g-3 citizen-form" data-endpoint="/api/citizens/name">
                       <div class="col-md-6">
                         <label class="form-label">First Name</label>
-                        <input type="text" class="form-control" />
+                        <input type="text" class="form-control" name="firstName" required />
                       </div>
+
                       <div class="col-md-6">
                         <label class="form-label">Last Name</label>
-                        <input type="text" class="form-control" />
+                        <input type="text" class="form-control" name="lastName" required />
                       </div>
+
                       <div class="col-12">
                         <button type="submit" class="btn btn-primary">
                           Search by Name

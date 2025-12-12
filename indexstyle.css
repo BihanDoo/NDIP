@@ -8,8 +8,8 @@ body {
 }
 
 :root {
-  --primary: #000000;
-  --primary-dark: #1c1c1c;
+  --primary: #a45200;
+  --primary-dark: #a45200;
   --glass-bg: rgba(255, 255, 255, 0.42);
   --border-glass: rgba(255, 255, 255, 0.25);
 }
@@ -102,6 +102,7 @@ body {
   object-fit: contain;
   padding: 20px;
   border-radius: 16px;
+
 }
 
 /* -------------------------------------------------------

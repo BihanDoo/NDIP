@@ -121,19 +121,15 @@
                       <div class="col-md-6">
                         <label class="form-label">First Name</label>
                         <input type="text" class="form-control" name="firstName" id="FindByFName" onchange="fetchByFirstName()" oninput="fetchByFirstName()" required />
-                        <button type="button" class="btn btn-primary" onclick="fetchByFirstName()">
-                          Search by First Name
-                        </button>
+                        
                       </div>
 
                       
 
                       <div class="col-md-6">
                         <label class="form-label">Last Name</label>
-                        <input type="text" class="form-control" name="lastName" id="FindByLName" required />
-                        <button type="button" class="btn btn-primary" onclick="fetchBySecondName()">
-                          Search by Last Name
-                        </button>
+                        <input type="text" class="form-control" name="lastName" id="FindByLName" oninput="fetchBySecondName()" required />
+                        
                       </div>
 
                       <div class="col-12">
@@ -361,22 +357,24 @@
     
 
 
-    
 
-    function fetchBySecondName(){
+
+   async function fetchBySecondName(){
       const Lname = document.getElementById('FindByLName').value.trim();
       const SEARCH_API = 'http://localhost:3000/api/citizens';
 			
 
-			if (Fname=='') {
+			if (Lname=='') {
 				
 				return;
 			}
 			var tbody = document.getElementById('citizenTableBody');
 			if (!tbody) return;
+      
 			tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Searching...</td></tr>';
-
-			fetch(SEARCH_API + '?FirstName=' + encodeURIComponent(Fname), { method: 'GET' })
+      const delay = ms => new Promise(res => setTimeout(res, ms));
+      await delay(300);
+			fetch(SEARCH_API + '?LastName=' + encodeURIComponent(Lname), { method: 'GET' })
 				.then(function(res) {
 					if (!res.ok) throw new Error('Network response was not ok (' + res.status + ')');
 					console.log('Response received:', res);
@@ -438,7 +436,7 @@
 
 
 
-    function fetchByFirstName(){  
+    async function fetchByFirstName(){  
       const Fname = document.getElementById('FindByFName').value.trim();
        const SEARCH_API = 'http://localhost:3000/api/citizens';
 			
@@ -451,6 +449,8 @@
 			if (!tbody) return;
 			tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Searching...</td></tr>';
 
+      const delay = ms => new Promise(res => setTimeout(res, ms));
+      await delay(300);
 			fetch(SEARCH_API + '?FirstName=' + encodeURIComponent(Fname), { method: 'GET' })
 				.then(function(res) {
 					if (!res.ok) throw new Error('Network response was not ok (' + res.status + ')');

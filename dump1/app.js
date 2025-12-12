@@ -73,7 +73,9 @@ router.get('/', async (req, res) => {
                 res.json(citizensList);
                 console.log("fetched by first name");
             }else if(lastname){
-
+                const citizensList = await citizens.find({"LastName": { $regex: lastname, $options: "i" }}).toArray();
+                res.json(citizensList);
+                console.log("fetched by last name");
             }else{
                 const citizensList = await citizens.find({}).toArray();
                 res.json(citizensList);

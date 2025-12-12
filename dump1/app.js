@@ -110,6 +110,9 @@ router.post('/delete',async (req, res) => {
 
 });
 
+
+
+
 // app.post('/api/citizens/delete', async (req, res) => {
 //     try {
 //         const NDI = req.body.NDI_ID;

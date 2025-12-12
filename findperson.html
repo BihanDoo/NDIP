@@ -290,6 +290,7 @@
     <script>
 
       function fetchByID(){
+        console.log('Fetching by ID...');
             const SEARCH_API = 'http://localhost:3000/api/citizens';
 			const id = document.getElementById('searchByIdInput').value.trim();
 			if (!id) {
@@ -311,9 +312,10 @@
 					 //var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
                     //var list = data.citizens;
                     var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
+                    
                     console.log('Citizens fetched by ID:', list);
 					tbody.innerHTML = '';
-					if (!list || list.length === 0) {
+					if (!list[0] || list.length === 0) {
 						tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No records found</td></tr>';
 						return;
 					}
@@ -401,7 +403,7 @@
 							.replace(/'/g, '&#39;');
 					}
 					list.forEach(function (c) {
-						var ndi = c.NID;
+						var ndi = c.NID?c.NID:'';
 						var name = (c.FirstName || '') + (c.LastName ? ' ' + c.LastName : '');
 						var dob = c.DoB;
 						var email = c.Email;

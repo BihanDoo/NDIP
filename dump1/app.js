@@ -67,11 +67,14 @@ router.get('/', async (req, res) => {
             const citizensList = await citizens.findOne({"NID": value});
             res.json([citizensList]);
             console.log("fetched one");
+            console.log(citizensList);
         }else {
             if(firstname){
                 const citizensList = await citizens.find({"FirstName": { $regex: firstname, $options: "i" }}).toArray();
                 res.json(citizensList);
                 console.log("fetched by first name");
+                // console.log(citizensList);
+
             }else if(lastname){
                 const citizensList = await citizens.find({"LastName": { $regex: lastname, $options: "i" }}).toArray();
                 res.json(citizensList);

@@ -70,6 +70,8 @@ router.get('/', async (req, res) => {
         }else {
             if(firstname){
                 const citizensList = await citizens.find({"FirstName": firstname}).toArray();
+                res.json(citizensList);
+                console.log("fetched by first name");
             }else if(lastname){
 
             }else{
@@ -87,6 +89,33 @@ router.get('/', async (req, res) => {
         res.status(500).send('Error fetching citizens');
     }
 });
+
+router.post('/delete',async (req, res) => {
+    console.log("hmm");
+    try{
+        if (!citizens) citizens = db.collection(collectionName);
+        const value = req.query.NDI_ID;
+        const result = await citizens.deleteOne({ "NID": value });
+        res.json(result);
+        console.log("deleted: "+ result);
+    }catch (error){
+        console.log("error : " +error);
+    }
+
+
+});
+
+// app.post('/api/citizens/delete', async (req, res) => {
+//     try {
+//         const NDI = req.body.NDI_ID;
+//         const result = await citizens.deleteOne({ NDI_ID: NDI });
+//         console.log(result);
+        
+//     } catch (error) {
+
+//     }
+// });
+
 
 // Register a new citizen
 app.post('/api/citizens/register', async (req, res) => {

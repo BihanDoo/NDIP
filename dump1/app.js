@@ -5,6 +5,7 @@ let path = require("path");
 let app = express();
 let port = process.env.port || 3000;
 let router = express.Router();
+let router2 = express.Router();
 
 // MongoDB connection string - update this with your MongoDB URI
 const mongoURI = "mongodb://localhost:27017";
@@ -48,6 +49,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '..')));  // Serve static files from parent directory
 app.use('/api/citizens', router);
+app.use('/api/citizens/delete', router2);
+
 
 // GET /api/citizens
 // - If query param NDI_ID (or NID/nid) is present: return the matching citizen
@@ -59,7 +62,10 @@ router.get('/', async (req, res) => {
         const value = req.query.NDI_ID;
         const firstname = req.query.FirstName;
         const lastname = req.query.LastName;
-
+        const DOB = req.query.DOB;
+        const Email = req.query.Email;
+        const Phone = req.query.Phone;
+        const OCP = req.query.OCP;
 
         
         if (value) {
@@ -67,13 +73,35 @@ router.get('/', async (req, res) => {
             const citizensList = await citizens.findOne({"NID": value});
             res.json([citizensList]);
             console.log("fetched one");
+            console.log(citizensList);
         }else {
             if(firstname){
-                const citizensList = await citizens.find({"FirstName": firstname}).toArray();
+                const citizensList = await citizens.find({"FirstName": { $regex: firstname, $options: "i" }}).toArray();
                 res.json(citizensList);
                 console.log("fetched by first name");
-            }else if(lastname){
+                // console.log(citizensList);
 
+            }else if(lastname){
+                const citizensList = await citizens.find({"LastName": { $regex: lastname, $options: "i" }}).toArray();
+                res.json(citizensList);
+                console.log("fetched by last name");
+            }else if(DOB){
+                const citizensList = await citizens.find({"DoB": DOB}).toArray();
+                res.json(citizensList);
+                console.log("fetched by DOB");
+            }else if(Email){
+                
+                const citizensList = await citizens.find({"Email": { $regex: Email, $options: "i" }}).toArray();
+                res.json(citizensList);
+                console.log("fetched by Email: " +Email);
+            }else if(Phone){
+                const citizensList = await citizens.find({"Phone": { $regex: Phone, $options: "i" }}).toArray();
+                res.json(citizensList);
+                console.log("fetched by Phone: " +Phone);
+            }else if(OCP){
+                const citizensList = await citizens.find({"Occupation": { $regex: OCP, $options: "i" }}).toArray();
+                res.json(citizensList);
+                console.log("fetched by Occupation: " +OCP);
             }else{
                 const citizensList = await citizens.find({}).toArray();
                 res.json(citizensList);
@@ -90,11 +118,12 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.post('/delete',async (req, res) => {
+router2.post('/',async (req, res) => {
+    const value = req.body.NDI_ID;
     console.log("hmm");
     try{
         if (!citizens) citizens = db.collection(collectionName);
-        const value = req.query.NDI_ID;
+        
         const result = await citizens.deleteOne({ "NID": value });
         res.json(result);
         console.log("deleted: "+ result);
@@ -104,6 +133,9 @@ router.post('/delete',async (req, res) => {
 
 
 });
+
+
+
 
 // app.post('/api/citizens/delete', async (req, res) => {
 //     try {

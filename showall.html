@@ -119,26 +119,29 @@
             
 			const delay = ms => new Promise(res => setTimeout(res, ms));
 
-			await delay(500);
+			await delay(200);
 			// Fetch citizen data from backend API (vanilla JS, no jQuery)
 			console.log('Fetching citizen data from API...');
 			const API_BASE = 'http://localhost:3000/api/citizens/';
 
 			// perform GET request
 			fetch(API_BASE, { method: 'GET' })
-				.then(function (res) {
+				.then(async function (res) {
 					if (!res.ok) throw new Error('Network response was not ok (' + res.status + ')');
-					console.log('Response received:', res);
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Loading...</td></tr><tr><td colspan="8" class="text-center text-muted"><div class="progress" role="progressbar" aria-label="Animated striped" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 55%"></div></div></td></tr>';
+					await delay(150);
+                    console.log('Response received:', res);
 					return res.json();
 				})
-				.then(function (data) {
+				.then(async function (data) {
 					var tbody = document.getElementById('citizenTableBody');
 					if (!tbody) return;
 
 					// support both array responses and object-wrapped results
 					var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
-					// clear existing rows
-					tbody.innerHTML = '';
+					tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Loading...</td></tr><tr><td colspan="8" class="text-center text-muted"><div class="progress" role="progressbar" aria-label="Animated striped" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 75%"></div></div></td></tr>';
+					await delay(100);
+                    tbody.innerHTML = '';
 					console.log('Citizens fetched:', list);
 					if (!list || list.length === 0) {
 						console.log('No citizens found');
@@ -183,6 +186,7 @@
 				.catch(function (err) {
 					console.error('Failed to fetch citizens:', err);
 					alert('Failed to fetch citizens: ' + (err && err.message ? err.message : err));
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading records</td></tr>';
 				});
 		}
 

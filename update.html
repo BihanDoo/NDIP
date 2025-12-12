@@ -189,49 +189,103 @@ Click an update button to test the API...
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-      //function handleUpdate(formId) {
+      function handleUpdate(formSelector) {
+        const form = $(formSelector);
 
-
-         const form = $("#updateFormId");
-         const endpoint = form.data("endpoint");
-
-         form.on("submit", function (e) {
+        form.on('submit', function (e) {
           e.preventDefault();
-          const NID = $("#ndiId").val();
-          if (NID == '') {
-
-            alert("NDI ID is required.");
-            return;
-          }
 
           const formDataArray = form.serializeArray();
           const dataObj = {};
           formDataArray.forEach(x => dataObj[x.name] = x.value);
 
+          // If this is the ID-based form, use the NDI ID directly
+          if (formSelector === '#updateFormId') {
+            const NID = $('#ndiId').val();
+            if (!NID) {
+              alert('NDI ID is required.');
+              return;
+            }
 
-          $("#resultArea").text("Updating...");
-          console.log("Submitting data:", dataObj);
+            $('#resultArea').text('Updating...');
+            console.log('Submitting data (by NID):', dataObj);
 
-          $.ajax({
-            url: "http://localhost:3000/api/citizens/update/?id=" + NID,
-            method: "PUT",
-            contentType: "application/json",
-            data: JSON.stringify(dataObj),
-            success: function (res) {
-              $("#resultArea").text(JSON.stringify(res, null, 2));
-            },
-            error: function (xhr) {
-              $("#resultArea").text(
-                "Error: " + xhr.status + "\n" + xhr.responseText
-              );
-            },
-          });
+            $.ajax({
+              url: 'http://localhost:3000/api/citizens/update/?id=' + encodeURIComponent(NID),
+              method: 'PUT',
+              contentType: 'application/json',
+              data: JSON.stringify(dataObj),
+              success: function (res) {
+                $('#resultArea').text(JSON.stringify(res, null, 2));
+              },
+              error: function (xhr) {
+                $('#resultArea').text('Error: ' + xhr.status + '\n' + xhr.responseText);
+              }
+            });
+
+            return;
+          }
+
+          // Otherwise handle update by FirstName: lookup by FirstName then update by NID
+          if (formSelector === '#updateFormName') {
+            const firstName = dataObj.FirstName && dataObj.FirstName.trim();
+            if (!firstName) {
+              alert('Current First Name is required.');
+              return;
+            }
+
+            $('#resultArea').text('Searching for matching citizens...');
+            console.log('Searching by FirstName:', firstName);
+
+            $.ajax({
+              url: 'http://localhost:3000/api/citizens?FirstName=' + encodeURIComponent(firstName),
+              method: 'GET',
+              dataType: 'json',
+              success: function (list) {
+                if (!list || list.length === 0) {
+                  $('#resultArea').text('No citizens found with that first name.');
+                  return;
+                }
+
+                if (list.length > 1) {
+                  $('#resultArea').text('Multiple citizens found. Please refine your search or use NDI ID.');
+                  return;
+                }
+
+                const citizen = list[0];
+                const nid = citizen.NID || citizen.nid || citizen.NDI_ID || citizen.id;
+                if (!nid) {
+                  $('#resultArea').text('Found citizen does not have an NID to update.');
+                  return;
+                }
+
+                $('#resultArea').text('Updating citizen with NID: ' + nid);
+                console.log('Submitting data (by FirstName -> NID):', dataObj);
+
+                $.ajax({
+                  url: 'http://localhost:3000/api/citizens/update/?id=' + encodeURIComponent(nid),
+                  method: 'PUT',
+                  contentType: 'application/json',
+                  data: JSON.stringify(dataObj),
+                  success: function (res) {
+                    $('#resultArea').text(JSON.stringify(res, null, 2));
+                  },
+                  error: function (xhr) {
+                    $('#resultArea').text('Error: ' + xhr.status + '\n' + xhr.responseText);
+                  }
+                });
+              },
+              error: function (xhr) {
+                $('#resultArea').text('Search error: ' + xhr.status + '\n' + xhr.responseText);
+              }
+            });
+          }
         });
-      //}
+      }
 
       $(document).ready(function () {
-        handleUpdate("#updateFormId");
-        handleUpdate("#updateFormName");
+        handleUpdate('#updateFormId');
+        handleUpdate('#updateFormName');
       });
     </script>
   </body>

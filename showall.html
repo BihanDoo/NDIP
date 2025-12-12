@@ -35,8 +35,10 @@
 			<div class="container">
 				<div class="d-flex justify-content-between align-items-center mb-3">
 					<div class="d-flex gap-2">
-						<input id="searchInput" class="form-control" style="min-width:300px" placeholder="Search by name, NDI ID, email..." />
-						<button id="searchBtn" class="btn btn-outline-secondary">Search</button>
+                        
+						<input id="searchByIdInput" class="form-control" style="min-width:300px" placeholder="Search by NDI ID ..." />
+						<button id="searchByIDBtn" class="btn btn-outline-secondary" onclick="fetchByID()">Search</button>
+                        <!-- oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo -->
 					</div>
 					<div>
 						<button id="refreshBtn" class="btn btn-primary">Refresh</button>
@@ -93,14 +95,14 @@
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 		<script>
             fetchCitizens();
-			// UI-only helpers (no backend calls). Replace these with AJAX when ready.
+			
 			(function () {
 				document.getElementById('refreshBtn').addEventListener('click', function () {
 					fetchCitizens();
 				});
 
 				document.getElementById('exportBtn').addEventListener('click', function () {
-					alert('Export CSV clicked — implement CSV generation on the client or server');
+					
 				});
 
 				document.getElementById('searchBtn').addEventListener('click', function () {
@@ -109,7 +111,7 @@
 						alert('Enter a search term (name, NDI ID, or email)');
 						return;
 					}
-					alert('Search for: ' + q + ' — wire this to your search API');
+					
 				});
 			})();
 
@@ -120,7 +122,7 @@
 			const delay = ms => new Promise(res => setTimeout(res, ms));
 
 			await delay(200);
-			// Fetch citizen data from backend API (vanilla JS, no jQuery)
+			
 			console.log('Fetching citizen data from API...');
 			const API_BASE = 'http://localhost:3000/api/citizens/';
 
@@ -129,8 +131,11 @@
 				.then(async function (res) {
 					if (!res.ok) throw new Error('Network response was not ok (' + res.status + ')');
                     tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Loading...</td></tr><tr><td colspan="8" class="text-center text-muted"><div class="progress" role="progressbar" aria-label="Animated striped" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"><div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 55%"></div></div></td></tr>';
-					await delay(150);
-                    console.log('Response received:', res);
+					
+				
+					console.log('Response received:', res);
+                    await delay(150);
+                    
 					return res.json();
 				})
 				.then(async function (data) {
@@ -187,6 +192,72 @@
 					console.error('Failed to fetch citizens:', err);
 					alert('Failed to fetch citizens: ' + (err && err.message ? err.message : err));
                     tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading records</td></tr>';
+				});
+		}
+		
+		function fetchByID(){
+            const SEARCH_API = 'http://localhost:3000/api/citizens';
+			const id = document.getElementById('searchByIdInput').value.trim();
+			if (!id) {
+				alert('Enter an NDI ID to search');
+				return;
+			}
+			var tbody = document.getElementById('citizenTableBody');
+			if (!tbody) return;
+			tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Searching...</td></tr>';
+
+			fetch(SEARCH_API + '?NDI_ID=' + encodeURIComponent(id), { method: 'GET' })
+				.then(function(res) {
+					if (!res.ok) throw new Error('Network response was not ok (' + res.status + ')');
+					console.log('Response received:', res);
+                    return res.json();
+                    
+				})
+				.then(function(data) {
+					 //var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
+                    //var list = data.citizens;
+                    var list = Array.isArray(data) ? data : (data && Array.isArray(data.citizens) ? data.citizens : []);
+                    console.log('Citizens fetched by ID:', list);
+					tbody.innerHTML = '';
+					if (!list || list.length === 0) {
+						tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No records found</td></tr>';
+						return;
+					}
+					function escapeHtml(str) {
+						if (str === null || str === undefined) return '';
+						return String(str)
+							.replace(/&/g, '&amp;')
+							.replace(/</g, '&lt;')
+							.replace(/>/g, '&gt;')
+							.replace(/"/g, '&quot;')
+							.replace(/'/g, '&#39;');
+					}
+					list.forEach(function (c) {
+						var ndi = c.NID;
+						var name = (c.FirstName || '') + (c.LastName ? ' ' + c.LastName : '');
+						var dob = c.DoB;
+						var email = c.Email;
+						var phone = c.Phone;
+						var occupation = c.Occupation;
+						var nationality = c.Nationality;
+						var blood = c.Blood_Group;
+						var tr = document.createElement('tr');
+						tr.innerHTML =
+							'<td>' + escapeHtml(ndi) + '</td>' +
+							'<td>' + escapeHtml(name) + '</td>' +
+							'<td>' + escapeHtml(dob) + '</td>' +
+							'<td>' + escapeHtml(email) + '</td>' +
+							'<td>' + escapeHtml(phone) + '</td>' +
+							'<td>' + escapeHtml(occupation) + '</td>' +
+							'<td>' + escapeHtml(nationality) + '</td>' +
+							'<td>' + escapeHtml(blood) + '</td>';
+						tbody.appendChild(tr);
+					});
+				})
+				.catch(function(err) {
+					console.error('Search failed:', err);
+					alert('Search failed: ' + (err && err.message ? err.message : err));
+					tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading records</td></tr>';
 				});
 		}
 

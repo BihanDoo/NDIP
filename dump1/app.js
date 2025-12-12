@@ -25,6 +25,17 @@ MongoClient.connect(mongoURI)
         // Start server after MongoDB connection
         app.listen(port, () => {
             console.log("Listening on port " + port);
+            const frames = ['\\', '|', '/', '-']; // The animation frames
+            let i = 0;
+
+            const loader = setInterval(() => {
+  // Use \r to return the cursor to the start of the current line
+  // The extra space overwrites any longer previous characters
+            process.stdout.write('\r' + frames[i++] + ' '); 
+            i %= frames.length; // Loop back to the start of the frames array
+            }, 250);
+
+
         });
     })
     .catch(error => {
@@ -45,30 +56,32 @@ app.use('/api/citizens', router);
 router.get('/', async (req, res) => {
     try {
         if (!citizens) citizens = db.collection(collectionName);
+        const value = req.query.NDI_ID;
+        const firstname = req.query.FirstName;
+        const lastname = req.query.LastName;
 
-        const lookup = req.query && (req.query.NDI_ID || req.query.NDI || req.query.NID || req.query.nid || req.query.ndi_id);
-        if (lookup) {
-            const orClauses = [];
-            // numeric match
-            const asNum = Number(lookup);
-            if (!Number.isNaN(asNum) && isFinite(asNum)) orClauses.push({ NDI_ID: asNum }, { id: asNum });
 
-            // string matches
-            orClauses.push({ NDI_ID: lookup }, { NID: lookup }, { id: lookup });
+        
+        if (value) {
+            console.log("fetch by id: "+value);
+            const citizensList = await citizens.findOne({"NID": value});
+            res.json([citizensList]);
+            console.log("fetched one");
+        }else {
+            if(firstname){
 
-            // try MongoDB ObjectId match
-            if (ObjectId.isValid(lookup)) {
-                try { orClauses.push({ _id: new ObjectId(lookup) }); } catch (e) { /* ignore */ }
+            }else if(lastname){
+
+            }else{
+                const citizensList = await citizens.find({}).toArray();
+                res.json(citizensList);
+                console.log("fetched all");
             }
-
-            const citizen = await citizens.findOne({ $or: orClauses });
-            if (!citizen) return res.status(404).send('Citizen not found');
-            const { _id, ...safe } = citizen;
-            return res.json(safe);
+            
         }
+        
 
-        const citizensList = await citizens.find({}).toArray();
-        res.json(citizensList);
+       
     } catch (error) {
         console.error("Error fetching citizens:", error);
         res.status(500).send('Error fetching citizens');

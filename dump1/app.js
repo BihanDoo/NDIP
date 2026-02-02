@@ -49,8 +49,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '..')));  // Serve static files from parent directory
+
+
+//main route
 app.use('/api/citizens', router);
+//delete
 app.use('/api/citizens/delete', router2);
+//update
 app.use('/api/citizens/update', router3);
 
 
@@ -78,33 +83,40 @@ router.get('/', async (req, res) => {
             console.log(citizensList);
         }else {
             if(firstname){
+                //first name
                 const citizensList = await citizens.find({"FirstName": { $regex: firstname, $options: "i" }}).toArray();
                 res.json(citizensList);
                 console.log("fetched by first name");
                 // console.log(citizensList);
 
             }else if(lastname){
+                //last name
                 const citizensList = await citizens.find({"LastName": { $regex: lastname, $options: "i" }}).toArray();
                 res.json(citizensList);
                 console.log("fetched by last name");
             }else if(DOB){
+                //dob
                 const citizensList = await citizens.find({"DoB": DOB}).toArray();
                 res.json(citizensList);
                 console.log("fetched by DOB");
             }else if(Email){
-                
+                //email
                 const citizensList = await citizens.find({"Email": { $regex: Email, $options: "i" }}).toArray();
                 res.json(citizensList);
                 console.log("fetched by Email: " +Email);
             }else if(Phone){
+                //phone
                 const citizensList = await citizens.find({"Phone": { $regex: Phone, $options: "i" }}).toArray();
                 res.json(citizensList);
                 console.log("fetched by Phone: " +Phone);
             }else if(OCP){
+                //occupation
                 const citizensList = await citizens.find({"Occupation": { $regex: OCP, $options: "i" }}).toArray();
                 res.json(citizensList);
                 console.log("fetched by Occupation: " +OCP);
             }else{
+
+                //fetch all
                 const citizensList = await citizens.find({}).toArray();
                 res.json(citizensList);
                 console.log("fetched all");
@@ -122,7 +134,7 @@ router.get('/', async (req, res) => {
 
 router2.post('/',async (req, res) => {
     const value = req.body.NDI_ID;
-    console.log("hmm");
+    
     try{
         if (!citizens) citizens = db.collection(collectionName);
         
@@ -137,12 +149,12 @@ router2.post('/',async (req, res) => {
 });
 
 
-
+//update
 router3.put('/', async (req, res) => {
     const value = req.query.id;  
     const payload = req.body || {};
 
-    console.log("mm"+req.body);
+    
     console.log("Request body:", payload);
 
     if (!payload.FirstName || !payload.LastName) {
@@ -249,6 +261,45 @@ app.post('/api/citizens/register', async (req, res) => {
         res.status(500).json({ error: 'Error registering citizen' });
     }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

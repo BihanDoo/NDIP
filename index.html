@@ -181,8 +181,7 @@
             <h2 class="section-title">Latest updates</h2>
             <p>
               Stay informed on new features, scheduled maintenance, and system
-              advisories. These cards can be loaded via AJAX when backend APIs
-              are ready.
+              advisories.
             </p>
           </div>
           <div class="col-lg-6">
@@ -238,7 +237,7 @@
           },
         ];
 
-        // Example hook to show where AJAX can inject content later.
+        
         function queueAnnouncements(data) {
           const fragment = $(document.createDocumentFragment());
 
@@ -260,12 +259,12 @@
           event.preventDefault();
           const endpoint = $(this).data("endpoint");
 
-          // Replace this alert with $.ajax({ url: endpoint, ... }) later.
+          
           alert("Support request prepared for " + endpoint);
         });
 
         $("#requestServiceBtn").on("click", function () {
-          // Placeholder for future AJAX modal or request workflow.
+          
           alert("Service request feature coming soon.");
         });
       })();

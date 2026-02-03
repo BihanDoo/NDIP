@@ -300,8 +300,9 @@
     <script>
 
       function fetchByID(){
+		const urlip = window.location.hostname;
         console.log('Fetching by ID...');
-            const SEARCH_API = 'http://localhost:3000/api/citizens';
+            const SEARCH_API = 'http://' + urlip + ':3000/api/citizens';
 			const id = document.getElementById('searchByIdInput').value.trim();
 			if (!id) {
 				alert('Enter an NDI ID to search');
@@ -373,8 +374,8 @@
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
    async function fetchBySecondName(){
       const Lname = document.getElementById('FindByLName').value.trim();
-      const SEARCH_API = 'http://localhost:3000/api/citizens';
-			
+	  const urlip = window.location.hostname;
+      const SEARCH_API = 'http://' + urlip + ':3000/api/citizens';
 
 			if (Lname=='') {
 				
@@ -456,8 +457,8 @@ async function fetchByDOB(){
       const MM = Number(document.getElementById('DOBMM').value);
       const YYYY = Number(document.getElementById('DOBYYYY').value);
       const DOB = YYYY + '-' + MM + '-' + DD;
-      const SEARCH_API = 'http://localhost:3000/api/citizens';
-			
+	  const urlip = window.location.hostname;
+      const SEARCH_API = 'http://' + urlip + ':3000/api/citizens';
 
 			if (DOB=='') {
 				
@@ -535,8 +536,8 @@ async function fetchByDOB(){
 
     async function fetchByFirstName(){  
       const Fname = document.getElementById('FindByFName').value.trim();
-       const SEARCH_API = 'http://localhost:3000/api/citizens';
-			
+	  const urlip = window.location.hostname;
+       const SEARCH_API = 'http://' + urlip + ':3000/api/citizens';
 
 			if (Fname=='') {
 				
@@ -614,8 +615,8 @@ async function fetchByDOB(){
 
     async function fetchByEmail(){
       const Email = document.getElementById('fetchEmail').value.trim();
-      const SEARCH_API = 'http://localhost:3000/api/citizens';
-			
+	  const urlip = window.location.hostname;
+      const SEARCH_API = 'http://' + urlip + ':3000/api/citizens';
 
 			if (Email=='') {
 				
@@ -692,8 +693,8 @@ async function fetchByDOB(){
     
 async function fetchByPhoneNumber(){
       const Phone = document.getElementById('fetchPhone').value.trim();
-      const SEARCH_API = 'http://localhost:3000/api/citizens';
-			
+	  const urlip = window.location.hostname;
+      const SEARCH_API = 'http://' + urlip + ':3000/api/citizens';
 
 			if (Phone=='') {
 				
@@ -776,8 +777,8 @@ async function fetchByPhoneNumber(){
 
     async function fetchByOccupation(){  
       const OCP = document.getElementById('FindByOCP').value.trim();
-       const SEARCH_API = 'http://localhost:3000/api/citizens';
-			
+	  const urlip = window.location.hostname;
+       const SEARCH_API = 'http://' + urlip + ':3000/api/citizens';
 
 			if (OCP=='') {
 				

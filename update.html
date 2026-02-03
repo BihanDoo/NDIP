@@ -190,6 +190,7 @@ Click an update button to test the API...
 
     <script>
       function handleUpdate(formSelector) {
+        const urlip = window.location.hostname;
         const form = $(formSelector);
 
         form.on('submit', function (e) {
@@ -211,7 +212,8 @@ Click an update button to test the API...
             console.log('Submitting data (by NID):', dataObj);
 
             $.ajax({
-              url: 'http://localhost:3000/api/citizens/update/?id=' + encodeURIComponent(NID),
+              
+              url: 'http://' + urlip + ':3000/api/citizens/update/?id=' + encodeURIComponent(NID),
               method: 'PUT',
               contentType: 'application/json',
               data: JSON.stringify(dataObj),
@@ -236,9 +238,9 @@ Click an update button to test the API...
 
             $('#resultArea').text('Searching for matching citizens...');
             console.log('Searching by FirstName:', firstName);
-
+const urlip = window.location.hostname;
             $.ajax({
-              url: 'http://localhost:3000/api/citizens?FirstName=' + encodeURIComponent(firstName),
+              url: 'http://' + urlip + ':3000/api/citizens?FirstName=' + encodeURIComponent(firstName),
               method: 'GET',
               dataType: 'json',
               success: function (list) {
@@ -261,9 +263,9 @@ Click an update button to test the API...
 
                 $('#resultArea').text('Updating citizen with NID: ' + nid);
                 console.log('Submitting data (by FirstName -> NID):', dataObj);
-
+                const urlip = window.location.hostname;
                 $.ajax({
-                  url: 'http://localhost:3000/api/citizens/update/?id=' + encodeURIComponent(nid),
+                  url: 'http://' + urlip + ':3000/api/citizens/update/?id=' + encodeURIComponent(nid),
                   method: 'PUT',
                   contentType: 'application/json',
                   data: JSON.stringify(dataObj),

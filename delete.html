@@ -102,9 +102,9 @@
         }
 
         alertArea.html('<div class="alert alert-info" role="alert">Deleting...</div>');
-
+        const urlip = window.location.hostname;
         // The server's delete route expects the NDI_ID as a query parameter
-        fetch('http://localhost:3000/api/citizens/delete?NDI_ID=' + encodeURIComponent(citizenId), {
+        fetch('http://' + urlip + ':3000/api/citizens/delete?NDI_ID=' + encodeURIComponent(citizenId), {
           method: 'POST'
         })
         .then(resp => resp.json())
@@ -132,9 +132,9 @@
         const btn = $(this);
         if (!id) return;
         if (!confirm('Delete citizen with NID: ' + id + '?')) return;
-
+const urlip = window.location.hostname;
         // Call delete API as above
-        fetch('http://localhost:3000/api/citizens/delete?NDI_ID=' + encodeURIComponent(id), { method: 'POST' })
+        fetch('http://' + urlip + ':3000/api/citizens/delete?NDI_ID=' + encodeURIComponent(id), { method: 'POST' })
           .then(resp => resp.json())
           .then(json => {
             const ok = json && (json.deletedCount === 1 || json.result && json.result.n === 1);

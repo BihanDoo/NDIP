@@ -141,8 +141,8 @@
           
           console.log('Submitting data:', data);
           alertArea.innerHTML = '<div class="alert alert-info" role="alert">Submitting...</div>';
-          
-          fetch('http://localhost:3000/api/citizens/register', {
+          const urlip = window.location.hostname;
+          fetch('http://' + urlip + ':3000/api/citizens/register', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded'

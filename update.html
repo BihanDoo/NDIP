@@ -213,7 +213,7 @@ Click an update button to test the API...
 
             $.ajax({
               
-              url: 'http://' + urlip + ':3000/api/citizens/update/?id=' + encodeURIComponent(NID),
+              url: 'http://' + urlip + '/api/citizens/update/?id=' + encodeURIComponent(NID),
               method: 'PUT',
               contentType: 'application/json',
               data: JSON.stringify(dataObj),
@@ -240,7 +240,7 @@ Click an update button to test the API...
             console.log('Searching by FirstName:', firstName);
 const urlip = window.location.hostname;
             $.ajax({
-              url: 'http://' + urlip + ':3000/api/citizens?FirstName=' + encodeURIComponent(firstName),
+              url: 'http://' + urlip + '/api/citizens?FirstName=' + encodeURIComponent(firstName),
               method: 'GET',
               dataType: 'json',
               success: function (list) {
@@ -265,7 +265,7 @@ const urlip = window.location.hostname;
                 console.log('Submitting data (by FirstName -> NID):', dataObj);
                 const urlip = window.location.hostname;
                 $.ajax({
-                  url: 'http://' + urlip + ':3000/api/citizens/update/?id=' + encodeURIComponent(nid),
+                  url: 'http://' + urlip + '/api/citizens/update/?id=' + encodeURIComponent(nid),
                   method: 'PUT',
                   contentType: 'application/json',
                   data: JSON.stringify(dataObj),

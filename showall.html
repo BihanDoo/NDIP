@@ -125,7 +125,7 @@
 			
 			console.log('Fetching citizen data from API...');
 			const urlip = window.location.hostname;
-			const API_BASE = 'http://' + urlip + ':3000/api/citizens/';
+			const API_BASE = 'http://' + urlip + '/api/citizens/';
 
 			// perform GET request
 			fetch(API_BASE, { method: 'GET' })
@@ -198,7 +198,7 @@
 		
 		function fetchByID(){
 			const urlip = window.location.hostname;
-            const SEARCH_API = 'http://' + urlip + ':3000/api/citizens';
+            const SEARCH_API = 'http://' + urlip + '/api/citizens';
 			const id = document.getElementById('searchByIdInput').value.trim();
 			if (!id) {
 				alert('Enter an NDI ID to search');
